@@ -1,0 +1,33 @@
+{
+    "name": "labile/astaroth-framework",
+    "description": "framework for creating VK bots",
+    "type": "project",
+    "authors": [
+        {
+            "name": "labile",
+            "email": "1a6i1e@gmail.com"
+        }
+    ],
+
+    "minimum-stability": "stable",
+
+    "require": {
+        "labile/astaroth-core": "dev-main",
+        "doctrine/orm": "^2.9",
+        "symfony/cache": "^5.3",
+        "athlon1600/youtube-downloader": "^3.0"
+    },
+
+    "autoload-dev": {
+        "psr-4": {
+            "App\\": "App/"
+        }
+    },
+
+    "scripts": {
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "php -S 0.0.0.0:8000"
+        ]
+    }
+}
