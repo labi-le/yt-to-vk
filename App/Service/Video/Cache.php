@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace App\Service\Video;
 
-use App\Entity\Video;
+use App\Entity\YouTubeVideo;
 use Astaroth\Support\Facades\Entity;
 
 class Cache
 {
     /**
-     * @param string $id
-     * @return Video|null
+     * @param VideoInterface $video
+     * @return YouTubeVideo|null
      */
-    public static function get(string $id): ?Video
+    public static function get(VideoInterface $video): ?YouTubeVideo
     {
-        return (new Entity())->find(Video::class, $id);
+        return (new Entity())->find($video->getType(), $video->getId());
     }
 
-    public static function cache(Video $video): Video
+    public static function cache(VideoInterface $video): VideoInterface
     {
         $entity = new Entity();
         $entity->persist($video);

@@ -5,58 +5,79 @@ declare(strict_types=1);
 namespace App\Service\Video;
 
 use App\Entity\UserData;
+use App\Entity\YouTubeVideo;
 use Astaroth\Support\Facades\Upload;
 use Astaroth\VkUtils\Builders\Attachments\Video;
-use YouTube\Exception\TooManyRequestsException;
-use YouTube\Exception\YouTubeException;
-use YouTube\YouTubeDownloader;
+use YoutubeDl\Options;
+use YoutubeDl\YoutubeDl;
 
 class Downloader
 {
     /**
-     * @throws YouTubeException
-     * @throws TooManyRequestsException
-     * @throws \Exception
+     * @param VideoInterface $video
+     * @param UserData $userData
+     * @param callable $onProgress
+     * @return VideoInterface
+     * @throws InvalidAccessTokenException
+     * @throws MissingAccessTokenException
      */
-    public static function upload(string $id, UserData $userData): \App\Entity\Video
+    public static function upload(VideoInterface $video, UserData $userData, callable $onProgress): VideoInterface
     {
         $access_token = UserConfigurator::getAccessToken($userData);
 
-        $videoEntity = VideoService::get($id);
+//        reference
+//        if ($video instanceof YouTubeVideo) {
+//            VideoService::get($video);
+//        }
 
-        $downloadInformation = (new YouTubeDownloader())->getDownloadLinks($id)->getFirstCombinedFormat();
+        $upload_new_token = Upload::changeToken($access_token);
 
-        $downloadUrl = $downloadInformation?->url;
-        if ($downloadUrl) {
-            $upload_new_token = Upload::changeToken($access_token);
-            $attachment = $upload_new_token->upload(
-                (new Video(self::download($downloadUrl)))
-                    ->setIsPrivate(true)
-                    ->setName($videoEntity->getTitle())
-                    ->setGroupId(UPLOAD_GROUP)
-                    ->setDescription("Описание съели злые волки!!!")
-            )[0];
+        $videoPath = self::download($video, $onProgress);
+        $attachment = $upload_new_token->upload(
+            (new Video($videoPath))
+                ->setIsPrivate(true)
+                ->setName($video->getTitle())
+                ->setGroupId(UPLOAD_GROUP)
+                ->setDescription("Описание съели злые волки!!!")
+        )[0];
 
-            return $videoEntity
-                ->setCached(true)
-                ->setVkAttachment($attachment);
-        }
+        @unlink($videoPath);
 
-        return throw new \Exception("Не удалось загрузить видео");
+        return $video->setVkAttachment($attachment);
+
     }
 
     /**
      * Download video to local machine
-     * @param string $directLink
+     * @param VideoInterface $video
+     * @param callable $onProgress
      * @return string
      * @throws \Exception
      */
-    private static function download(string $directLink): string
+    private static function download(VideoInterface $video, callable $onProgress): string
     {
-        $filename = tempnam(sys_get_temp_dir(), (string)random_int(0, 2));
-        copy($directLink, $filename);
-        register_shutdown_function(static fn() => @unlink($filename));
+        $yt = new YoutubeDl();
+        $yt->setBinPath("youtube-dl");
+        $yt->onProgress($onProgress);
 
-        return $filename;
+        $collection = $yt->download(
+            Options::create()
+                ->downloadPath(sys_get_temp_dir())
+                ->url($video->getLink())
+                ->output('%(title)s.%(ext)s')
+        );
+
+        $downloadedVideo = current($collection->getVideos());
+        $filePath = $downloadedVideo->getFilename();
+
+        $video
+            ->setTitle($downloadedVideo->getTitle())
+            ->setAuthor($downloadedVideo->getChannel());
+
+        if ($filePath === null) {
+            throw new \Exception("Не удалось получить название файла");
+        }
+
+        return $filePath;
     }
 }

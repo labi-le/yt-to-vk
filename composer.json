@@ -15,7 +15,7 @@
         "labile/astaroth-core": "dev-main",
         "doctrine/orm": "^2.9",
         "symfony/cache": "^5.3",
-        "athlon1600/youtube-downloader": "^3.0"
+        "norkunas/youtube-dl-php": "dev-master"
     },
 
     "autoload-dev": {

@@ -52,7 +52,7 @@ class UserConfigurator
         $em = new Entity;
         $userRepository = $em->find(UserData::class, $userData->getId());
 
-        if ($userRepository->getAccessToken() === null) {
+        if ($userRepository === null || $userRepository->getAccessToken() === null) {
             throw new MissingAccessTokenException("Не установлен access token для загрузки видео");
         }
 

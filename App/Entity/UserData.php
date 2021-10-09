@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Table;
 
@@ -18,7 +18,7 @@ class UserData
 {
     /**
      * @Id
-     * @ORM\GeneratedValue(strategy="NONE")
+     * @GeneratedValue(strategy="NONE")
      * @Column(type="integer", unique=true, nullable=false)
      */
     private int $id;

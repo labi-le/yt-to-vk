@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Command\Menu;
 
+use App\Entity\YouTubeVideo;
 use App\Service\Video\Render;
+use App\Service\Video\ServiceEnum;
 use Astaroth\Attribute\Attachment;
 use Astaroth\Attribute\Conversation;
 use Astaroth\Attribute\Event\MessageNew;
@@ -17,23 +19,31 @@ use Astaroth\DataFetcher\Events\MessageNew as Data;
 #[MessageNew]
 class VideoParser extends BaseCommands
 {
-    private const PATTERN = '%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i';
-
     /**
      * Генерация превью и кнопок
      * @param Data $data
      * @throws \Throwable
      */
-    #[MessageRegex(self::PATTERN)]
-    public function url(Data $data): void
+    #[MessageRegex(ServiceEnum::REGEX_YOUTUBE)]
+    public function previewYoutube(Data $data): void
     {
-        preg_match(self::PATTERN, $data->getText(), $matches);
+        preg_match(ServiceEnum::REGEX_YOUTUBE, $data->getText(), $matches);
 
-        [, $id] = $matches;
+        [$url, $id] = $matches;
         try {
-            Render::preview($data, $id);
-        } catch (\Throwable $e) {
-            $this->message($data->getPeerId(), "Не удалось загрузить превью\n\nWhy?\n" . $e->getMessage());
+            Render::preview(
+                $data,
+                (new YouTubeVideo())
+                    ->setId($id)
+            );
+        } catch (\Exception $e) {
+            $message = sprintf(
+                "Не удалось загрузить превью\n\nWhy?\n%s\n\nLine: %s\n\nFile\n%s",
+                $e->getMessage(),
+                $e->getLine(),
+                $e->getFile()
+            );
+            $this->message($data->getPeerId(), $message);
         }
     }
 

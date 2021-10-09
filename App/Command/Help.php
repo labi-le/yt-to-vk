@@ -31,7 +31,7 @@ class Help
         MessageAttribute("помогите", MessageAttribute::START_AS), MessageAttribute("сука как", MessageAttribute::START_AS),
         MessageAttribute("а как", MessageAttribute::START_AS)
     ]
-    public function help(Data $data, Create $create)
+    public function help(Data $data, Create $create): void
     {
         $keyboard = Facade::createKeyboardBasic(static function (FactoryInterface $factory) {
             return [
@@ -53,7 +53,7 @@ class Help
      * @throws \Throwable
      */
     #[Payload([VideoEnum::HELP => VideoEnum::DOWNLOAD])]
-    public function uploadVideo(Data $data)
+    public function uploadVideo(Data $data): void
     {
         Create::new(
             (new Message())
