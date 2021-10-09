@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service\Video;
 
+use App\Entity\PornHubVideo;
 use App\Entity\TikTokVideo;
 use App\Entity\YouTubeVideo;
 use Astaroth\DataFetcher\Events\MessageNew;
@@ -95,8 +96,12 @@ class Render
             return "🗣 {$video->getAuthor()}\n📹 {$video->getTitle()}";
         }
 
+        if ($video instanceof PornHubVideo) {
+            return "📹 {$video->getTitle()}";
+        }
+
         if ($video instanceof TikTokVideo) {
-            return  "🗣 {$video->getTitle()}";
+            return "🗣 {$video->getTitle()}";
         }
 
         throw new VideoServiceNotFoundException("Не реализован сервис обработки данного видео");

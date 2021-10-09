@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Service\Video;
 
 use App\Entity\UserData;
-use App\Entity\YouTubeVideo;
 use Astaroth\Support\Facades\Upload;
 use Astaroth\VkUtils\Builders\Attachments\Video;
 use YoutubeDl\Options;
@@ -24,11 +23,6 @@ class Downloader
     public static function upload(VideoInterface $video, UserData $userData, callable $onProgress): VideoInterface
     {
         $access_token = UserConfigurator::getAccessToken($userData);
-
-//        reference
-//        if ($video instanceof YouTubeVideo) {
-//            VideoService::get($video);
-//        }
 
         $upload_new_token = Upload::changeToken($access_token);
 

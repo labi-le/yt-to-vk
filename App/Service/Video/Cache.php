@@ -11,9 +11,9 @@ class Cache
 {
     /**
      * @param VideoInterface $video
-     * @return YouTubeVideo|null
+     * @return ?VideoInterface
      */
-    public static function get(VideoInterface $video): ?YouTubeVideo
+    public static function get(VideoInterface $video): ?VideoInterface
     {
         return (new Entity())->find($video->getType(), $video->getId());
     }

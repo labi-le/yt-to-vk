@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\Menu;
 
+use App\Entity\PornHubVideo;
 use App\Entity\TikTokVideo;
 use App\Entity\UserData;
 use App\Entity\YouTubeVideo;
@@ -41,6 +42,17 @@ class MainMenu extends BaseCommands
         );
     }
 
+    #[MessageRegex(ServiceEnum::REGEX_PORNHUB)]
+    public function downloadPornhub(Data $data): void
+    {
+        preg_match(ServiceEnum::REGEX_PORNHUB, $data->getText(), $matches);
+        $this->download(
+            (new PornHubVideo())
+                ->setId($matches[1]),
+            $data
+        );
+    }
+
     /**
      * Нажатие по кнопке загрузить
      * @param Data $data
@@ -60,7 +72,7 @@ class MainMenu extends BaseCommands
 
     private function download(VideoInterface $service, Data $data): void
     {
-        $cache = Cache::get($service);
+        $videoFromCache = Cache::get($service);
         try {
             $message = (new Message())
                 ->setPeerId($data->getPeerId())
@@ -70,14 +82,16 @@ class MainMenu extends BaseCommands
             $response = Create::new($message);
             $messageId = $response[0][0]["conversation_message_id"];
 
-            if ($cache === null) {
-                $video = Downloader::upload(
+            if ($videoFromCache === null) {
+                Downloader::upload(
                     $service,
                     new UserData($data->getPeerId()),
                     $this->onProgressMessage($message, $messageId)
                 );
 
-                Cache::cache($video);
+                Cache::cache($service);
+            } else {
+                $service = $videoFromCache;
             }
             $this->messagesEdit(Render::uploadedVideo($data, $service), $messageId);
         } catch (MissingAccessTokenException $e) {
@@ -136,7 +150,7 @@ class MainMenu extends BaseCommands
             }
 
             $delayCounter++;
-            if ($delayCounter === 20){
+            if ($delayCounter === 20) {
                 $message->setMessage($text);
                 $this->messagesEdit($message, $messageId);
                 $delayCounter = 0;

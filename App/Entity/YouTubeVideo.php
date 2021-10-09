@@ -27,10 +27,10 @@ class YouTubeVideo extends AbstractVideoEntity
         return $this->preview;
     }
     /**
-     * @param string|null $preview
+     * @param string $preview
      * @return YouTubeVideo
      */
-    public function setPreview(?string $preview): YouTubeVideo
+    public function setPreview(string $preview): YouTubeVideo
     {
         $this->preview = $preview;
         return $this;
