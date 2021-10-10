@@ -31,7 +31,7 @@ class Downloader
             (new Video($videoPath))
                 ->setIsPrivate(true)
                 ->setName($video->getTitle())
-                ->setGroupId(UPLOAD_GROUP)
+//                ->setGroupId(UPLOAD_GROUP)
                 ->setDescription("Описание съели злые волки!!!")
         )[0];
 

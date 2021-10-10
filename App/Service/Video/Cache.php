@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Service\Video;
 
-use App\Entity\YouTubeVideo;
 use Astaroth\Support\Facades\Entity;
 
 class Cache

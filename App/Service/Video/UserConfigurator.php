@@ -38,7 +38,9 @@ class UserConfigurator
     private static function checkToken(string $access_token): void
     {
         try {
-            Request::call("users.get", token: $access_token);
+            if (Request::call("users.get", token: $access_token) === []) {
+                throw new \Exception;
+            }
         } catch (\Throwable) {
             throw new InvalidAccessTokenException("Invalid access token");
         }

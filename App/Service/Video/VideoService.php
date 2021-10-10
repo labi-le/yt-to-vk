@@ -12,6 +12,7 @@ class VideoService
     /**
      * @param YouTubeVideo $video
      * @return YouTubeVideo
+     * @throws YouTubeForbiddenException
      */
     public static function get(YouTubeVideo $video): VideoInterface
     {
@@ -24,17 +25,23 @@ class VideoService
         return $video;
     }
 
-    #[ArrayShape(["author" => "?string", "preview" => "?string", "title" => "?string"])]
+    /**
+     * @throws YouTubeForbiddenException
+     */
+    #[ArrayShape(["author" => "?string", "preview" => "string", "title" => "string"])]
     private static function legacyParser(YouTubeVideo $video): array
     {
         $query = "https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v={$video->getId()}&format=json";
-        $response = @json_decode(@file_get_contents($query), true);
+
+        $content = @file_get_contents($query) ?: throw new YouTubeForbiddenException("Не удалось получить данные о видео");
+
+        $response = @json_decode($content, true);
 
         return
             [
-                "author" => $response["author_name"] ?? null,
-                "title" => $response["title"] ?? null,
-                "preview" => $response["thumbnail_url"] ?? null
+                "author" => $response["author_name"],
+                "title" => $response["title"],
+                "preview" => $response["thumbnail_url"]
             ];
     }
 }

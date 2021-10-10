@@ -53,7 +53,7 @@ class Help
      * @throws \Throwable
      */
     #[Payload([VideoEnum::HELP => VideoEnum::DOWNLOAD])]
-    public function uploadVideo(Data $data): void
+    public function uploadVideo(Data $data): bool
     {
         Create::new(
             (new Message())
@@ -64,5 +64,7 @@ class Help
                 ->setDontParseLinks(true)
                 ->setPeerId($data->getPeerId())
         );
+
+        return false;
     }
 }

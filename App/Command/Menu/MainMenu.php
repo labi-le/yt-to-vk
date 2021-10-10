@@ -150,7 +150,7 @@ class MainMenu extends BaseCommands
             }
 
             $delayCounter++;
-            if ($delayCounter === 20) {
+            if ($delayCounter === 50) {
                 $message->setMessage($text);
                 $this->messagesEdit($message, $messageId);
                 $delayCounter = 0;

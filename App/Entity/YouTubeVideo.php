@@ -12,11 +12,8 @@ use Doctrine\ORM\Mapping\Table;
  * @Entity
  * @Table(name="youtube_list")
  */
-class YouTubeVideo extends AbstractVideoEntity
+final class YouTubeVideo extends AbstractVideoEntity
 {
-    /**
-     * @Column(type="string", unique=true, nullable=true)
-     */
     private ?string $preview;
 
     /**
