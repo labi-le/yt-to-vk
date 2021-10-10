@@ -1,0 +1,32 @@
+version: "3.8"
+
+volumes:
+  db_volume:
+
+services:
+
+  db:
+    container_name: db
+    image: postgres:latest
+    restart: always
+    environment:
+      TZ: "Europe/Moscow"
+
+      POSTGRES_PASSWORD: "Ercdf6j72cUmYJfs4QNymkzQxtQvd2jcCjCzHdrkQK8KhEsteu8CYsewS9MvXXMADNK6eY4GXrYavyzKr5hned6RypWKq"
+      POSTGRES_USER: "app"
+
+    ports:
+        - "5432:5432"
+    volumes:
+        - db_volume:/data/db
+
+  app:
+    container_name: app
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+
+    env_file:
+      - .env
+    environment:
+      TZ: "Europe/Moscow"
