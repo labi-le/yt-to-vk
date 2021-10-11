@@ -18,7 +18,7 @@ use Astaroth\VkUtils\Builders\Message;
 
 #[Conversation(Conversation::ALL)]
 #[MessageNew]
-class Help
+final class Help
 {
     /**
      * @throws \Throwable
@@ -36,8 +36,7 @@ class Help
         $keyboard = Facade::createKeyboardBasic(static function (FactoryInterface $factory) {
             return [
                 [
-                    $factory->text("Загрузка видео", [VideoEnum::HELP => VideoEnum::DOWNLOAD]),
-                    $factory->text("Статистика", [VideoEnum::HELP => VideoEnum::STATISTICS], Text::COLOR_BLUE),
+                    $factory->callback("Загрузка видео", [VideoEnum::HELP => VideoEnum::DOWNLOAD]),
                 ]
             ];
         });
@@ -47,24 +46,5 @@ class Help
                 ->setKeyboard($keyboard)
                 ->setPeerId($data->getPeerId())
         );
-    }
-
-    /**
-     * @throws \Throwable
-     */
-    #[Payload([VideoEnum::HELP => VideoEnum::DOWNLOAD])]
-    public function uploadVideo(Data $data): bool
-    {
-        Create::new(
-            (new Message())
-                ->setMessage("Для загрузки видео необходимо скинуть ссылку,
-      например:
-        https://youtu.be/91tdYToLJ-w
-        youtu.be/91tdYToLJ-w")
-                ->setDontParseLinks(true)
-                ->setPeerId($data->getPeerId())
-        );
-
-        return false;
     }
 }

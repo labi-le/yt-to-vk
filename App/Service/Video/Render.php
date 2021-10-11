@@ -26,7 +26,7 @@ class Render
             $keyboard = Facade::createKeyboardInline(static function (FactoryInterface $factory) use ($video) {
                 return [
                     [
-                        $factory->text(VideoEnum::DOWNLOAD,
+                        $factory->callback(VideoEnum::DOWNLOAD,
                             [
                                 VideoEnum::MENU => VideoEnum::DOWNLOAD,
                                 VideoEnum::ID => $video->getId()

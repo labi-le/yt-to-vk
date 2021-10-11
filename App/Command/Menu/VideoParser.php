@@ -6,8 +6,7 @@ namespace App\Command\Menu;
 
 use App\Entity\YouTubeVideo;
 use App\Service\Video\Render;
-use App\Service\Video\ServiceEnum;
-use Astaroth\Attribute\Attachment;
+use App\Service\Video\RegexEnum;
 use Astaroth\Attribute\Conversation;
 use Astaroth\Attribute\Event\MessageNew;
 use Astaroth\Attribute\MessageRegex;
@@ -17,19 +16,19 @@ use Astaroth\DataFetcher\Events\MessageNew as Data;
 
 #[Conversation(Conversation::PERSONAL_DIALOG)]
 #[MessageNew]
-class VideoParser extends BaseCommands
+final class VideoParser extends BaseCommands
 {
     /**
      * Генерация превью и кнопок
      * @param Data $data
      * @throws \Throwable
      */
-    #[MessageRegex(ServiceEnum::REGEX_YOUTUBE)]
+    #[MessageRegex(RegexEnum::REGEX_YOUTUBE)]
     public function previewYoutube(Data $data): void
     {
-        preg_match(ServiceEnum::REGEX_YOUTUBE, $data->getText(), $matches);
+        preg_match(RegexEnum::REGEX_YOUTUBE, $data->getText(), $matches);
 
-        [$url, $id] = $matches;
+        [, $id] = $matches;
         try {
             Render::preview(
                 $data,
@@ -45,16 +44,5 @@ class VideoParser extends BaseCommands
             );
             $this->message($data->getPeerId(), $message);
         }
-    }
-
-    /**
-     * Нотайс если юзер отправил вместо ссылки на видео - вложение
-     * @param Data $data
-     * @throws \Throwable
-     */
-    #[Attachment(Attachment::VIDEO)]
-    public function videoAttachmentNotice(Data $data): void
-    {
-        $this->message($data->getPeerId(), "Не прикрепляй видео, а просто отправь ссылку на него");
     }
 }
